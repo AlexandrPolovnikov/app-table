@@ -1,55 +1,49 @@
+import downloadJSON from "../../../hooks/daownload";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import classes from "./control-panel.module.scss";
 import { selectTableSlice, setState } from "../../../store/reducers/table.slice";
+import addColumn from "../../../utils/add-column";
+import addRow from "../../../utils/add-row";
 import removeObject from "../../../utils/remove-column";
+import removeRow from "../../../utils/remove-row";
+import classes from "./control-panel.module.scss";
 
 export default function ControlPanel() {
     const dispatch = useAppDispatch();
     const { data } = useAppSelector(selectTableSlice);
-
-    function addColumn() {
-        const newColumnName = `column${Math.random()}`;
-        const newRows = data.map((row) => ({ ...row, [newColumnName]: "" }));
-        dispatch(
-            setState({
-                data: newRows,
-            }),
-        );
-    }
-    function addRow() {
-        const newRow = Object.keys(data[0]).reduce((acc, column) => ({ ...acc, [column]: "" }), {});
-        dispatch(
-            setState({
-                data: [...data, newRow],
-            }),
-        );
-    }
-
-    function removeRow(index: number) {
-        const updatedRows = data.filter((_, i) => i !== index);
-
-        dispatch(
-            setState({
-                rows: updatedRows,
-            }),
-        );
-    }
-
     return (
         <div className={`${classes.control} content column`}>
-            <button className={classes.button} onClick={() => addColumn()}>
+            <button
+                className={classes.button}
+                onClick={() => {
+                    let updData = addColumn(data);
+                    dispatch(
+                        setState({
+                            data: updData,
+                        }),
+                    );
+                }}>
                 Добавить столбец
             </button>
-            <button className={classes.button} onClick={addRow}>
+            <button
+                className={classes.button}
+                onClick={() => {
+                    let updData = addRow(data);
+                    dispatch(
+                        setState({
+                            data: updData,
+                        }),
+                    );
+                }}>
                 Добавить строку
             </button>
             <button
                 className={classes.button}
                 onClick={() => {
-                    let updData = removeObject(data, data.length - 1);
+                    let updData = removeObject(data, Object.keys(data[0]).at(-1) ?? "");
+
                     dispatch(
                         setState({
-                            data: updData ? updData : data,
+                            data: updData,
                         }),
                     );
                 }}>
@@ -58,10 +52,17 @@ export default function ControlPanel() {
             <button
                 className={classes.button}
                 onClick={() => {
-                    removeRow(data.length - 1);
+                    let updData = removeRow(data);
+                    dispatch(
+                        setState({
+                            data: updData,
+                        }),
+                    );
                 }}>
                 Удалить последнюю строку
             </button>
+
+            <button onClick={() => downloadJSON(data)}>Download JSON</button>
         </div>
     );
 }

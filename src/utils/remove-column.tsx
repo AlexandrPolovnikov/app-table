@@ -1,11 +1,17 @@
 import { dataI } from "../store/reducers/table.slice";
 
-export default function removeObject(data: dataI, indexToRemove: number) {
-    if (indexToRemove >= 0 && indexToRemove < data.length) {
-        const newData: dataI = [...data.slice(0, indexToRemove), ...data.slice(indexToRemove + 1)];
-
-        return newData;
-    }
-
-    return data;
+export default function removeObject(data: dataI, delKey: string) {
+    const newData: dataI[] = [];
+    data.forEach((obj: { [x: string]: any }) => {
+        const newObj: { [key: string]: any } = {};
+        for (let key in obj) {
+            if (key === delKey) {
+                delete newObj[delKey];
+            } else {
+                newObj[key] = obj[key];
+            }
+        }
+        newData.push(newObj);
+    });
+    return newData;
 }
