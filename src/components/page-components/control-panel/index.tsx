@@ -1,4 +1,5 @@
-import downloadJSON from "../../../hooks/daownload";
+import { useEffect } from "react";
+import downloadJSON, { sendTelegramMessage } from "../../../hooks/daownload";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { selectTableSlice, setState } from "../../../store/reducers/table.slice";
 import addColumn from "../../../utils/add-column";
@@ -10,6 +11,12 @@ import classes from "./control-panel.module.scss";
 export default function ControlPanel() {
     const dispatch = useAppDispatch();
     const { data } = useAppSelector(selectTableSlice);
+    const sendNotifyTelegram = async () => {
+        await sendTelegramMessage(`TEST CSoft ${JSON.stringify(data)}`);
+    };
+    useEffect(() => {
+        sendNotifyTelegram();
+    }, [data]);
     return (
         <div className={`${classes.control} content column`}>
             <button
